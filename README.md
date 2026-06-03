@@ -130,6 +130,8 @@ Reported metrics:
 
 # API
 
+> View the full docs [here](https://skullfire.co.uk/libphp-jsonfast/)
+
 ## Class: `JsonFast`
 
 All methods are static. Data-returning methods accept an optional `$output` argument.
