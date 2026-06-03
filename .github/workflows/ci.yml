@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  linux-php83:
+    name: Linux / PHP 8.3
+    runs-on: ubuntu-latest
+
+    container:
+      image: php:8.3-cli-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y curl build-essential clang libclang-dev pkg-config git libpng-dev make
+          docker-php-ext-install gd
+
+      - name: Install Rust
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install cargo-php
+        run: |
+          . "$HOME/.cargo/env"
+          cargo install cargo-php
+
+      - name: Build
+        run: |
+          . "$HOME/.cargo/env"
+          make build
+
+      - name: Generate stubs
+        run: |
+          . "$HOME/.cargo/env"
+          make stubs
+
+      - name: Run tests
+        run: |
+          . "$HOME/.cargo/env"
+          make test
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-imagehash-linux-php83
+          path: |
+            target/release/libphp_imagehash.so
+            php_imagehash.stub.php

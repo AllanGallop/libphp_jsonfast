@@ -1,0 +1,7 @@
+{
+    "require-dev": {
+        "phpbench/phpbench": "^1.6",
+        "opis/json-schema": "^2.4",
+        "justinrainbow/json-schema": "^6.0"
+    }
+}

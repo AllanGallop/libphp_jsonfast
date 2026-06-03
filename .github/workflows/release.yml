@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-linux-php83:
+    name: Release Linux PHP 8.3
+    runs-on: ubuntu-latest
+
+    container:
+      image: php:8.3-cli-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y curl build-essential clang libclang-dev pkg-config git libpng-dev make zip
+          docker-php-ext-install gd
+
+      - name: Install Rust
+        run: |
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install cargo-php
+        run: |
+          . "$HOME/.cargo/env"
+          cargo install cargo-php
+
+      - name: Build and test
+        run: |
+          . "$HOME/.cargo/env"
+          make release
+
+      - name: Package release
+        run: |
+          mkdir -p dist
+          cp target/release/libphp_jsonfast.so dist/php_jsonfast-linux-x86_64-php83.so
+          cp php_jsonfast.stub.php dist/
+          cp README.md dist/ 2>/dev/null || cp ReadMe.md dist/ 2>/dev/null || true
+          cd dist
+          zip php_jsonfast-linux-x86_64-php83.zip *
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/php_jsonfast-linux-x86_64-php83.zip
+          generate_release_notes: true
+
+  build-deb:
+    name: Build Debian package
+    runs-on: ubuntu-latest
+    needs: release-linux-php83
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build .deb
+        run: |
+          docker compose -f packaging/docker/docker-compose.yml run --rm debian-bookworm
+
+      - name: List built packages
+        run: |
+          ls -lah packaging/dist
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-package
+          path: packaging/dist/*.deb
+
+      - name: Attach .deb to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packaging/dist/*.deb
