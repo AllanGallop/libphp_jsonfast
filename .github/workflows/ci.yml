@@ -10,17 +10,21 @@ jobs:
     name: Linux / PHP 8.3
     runs-on: ubuntu-latest
 
-    container:
-      image: php:8.3-cli-bookworm
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: none
+
+      - name: Install system dependencies
         run: |
-          apt-get update
-          apt-get install -y curl build-essential clang libclang-dev pkg-config git libpng-dev make
-          docker-php-ext-install gd
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential clang libclang-dev pkg-config make \
+            libphp8.3-embed
 
       - name: Install Rust
         run: |
@@ -28,9 +32,13 @@ jobs:
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
       - name: Install cargo-php
+        env:
+          LIBRARY_PATH: /usr/lib
+          LD_LIBRARY_PATH: /usr/lib
+          RUSTFLAGS: -L /usr/lib -lphp
         run: |
           . "$HOME/.cargo/env"
-          cargo install cargo-php
+          cargo install cargo-php --locked --version 0.1.10
 
       - name: Build
         run: |
@@ -38,6 +46,8 @@ jobs:
           make build
 
       - name: Generate stubs
+        env:
+          LD_LIBRARY_PATH: /usr/lib
         run: |
           . "$HOME/.cargo/env"
           make stubs
@@ -50,7 +60,7 @@ jobs:
       - name: Upload extension artifact
         uses: actions/upload-artifact@v4
         with:
-          name: php-imagehash-linux-php83
+          name: php-jsonfast-linux-php83
           path: |
-            target/release/libphp_imagehash.so
-            php_imagehash.stub.php
+            target/release/libphp_jsonfast.so
+            php_jsonfast.stub.php

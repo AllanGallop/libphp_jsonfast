@@ -13,10 +13,12 @@ PHP ?= php
 PHP_FLAGS = -d zend.assertions=1 -d assert.exception=1 -d extension=$(EXT)
 PHP_RUN = $(PHP) $(PHP_FLAGS)
 
-.PHONY: build stubs test test-all test-basic test-output test-path test-analyse-repair test-schema test-diff coverage clean-coverage benchmark
+.PHONY: build release stubs test test-all test-basic test-output test-path test-analyse-repair test-schema test-diff coverage clean-coverage benchmark
 
 build:
 	cargo build --release
+
+release: build stubs test-all
 
 stubs:
 	cargo php stubs --stdout > php_jsonfast.stub.php
