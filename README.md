@@ -377,11 +377,11 @@ Current release artifacts target **Linux x86_64** and **PHP 8.3**. Windows DLL a
 
 ### Debian / Ubuntu
 
-Install from the `.deb` attached to the latest GitHub release:
+Install from the `.deb` attached to the latest GitHub release (replace `1.X.X-1` with latest version):
 
 ```bash
-curl -LO https://github.com/AllanGallop/libphp_jsonfast/releases/latest/download/php-jsonfast-amd64.deb
-sudo apt install ./php-jsonfast-amd64.deb
+curl -LO https://github.com/AllanGallop/libphp_jsonfast/releases/latest/download/php-jsonfast_1.X.X-1_amd64.deb
+sudo apt install ./php-jsonfast_1.X.X-1_amd64.deb
 ```
 
 Verify:
