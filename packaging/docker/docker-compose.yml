@@ -1,0 +1,24 @@
+services:
+  debian-bookworm:
+    image: debian:bookworm
+    working_dir: /app
+    volumes:
+      - type: bind
+        source: ../..
+        target: /app
+      - cargo-cache:/root/.cargo
+      - target-cache:/app/target
+    command: bash packaging/docker/build-deb.sh
+
+  test-install:
+    image: debian:bookworm
+    working_dir: /app
+    volumes:
+      - ../..:/app
+    stdin_open: true
+    tty: true
+    command: bash
+
+volumes:
+  cargo-cache:
+  target-cache:

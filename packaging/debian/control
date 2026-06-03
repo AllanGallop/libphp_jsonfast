@@ -1,0 +1,20 @@
+Source: php-jsonfast
+Section: php
+Priority: optional
+Maintainer: Allan Gallop <allan@skullfire.co.uk>
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-php,
+ php-dev,
+ cargo,
+ rustc
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: php-jsonfast
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ ${php:Depends}
+Description: PHP extension for parsing, repair, formatting and schema validation JSON.

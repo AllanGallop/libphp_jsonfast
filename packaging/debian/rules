@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+
+PHP_EXT_DIR := $(shell php-config --extension-dir)
+PHP_API_DIR := $(notdir $(PHP_EXT_DIR))
+PHP_VERSION := $(shell php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	rm -rf debian/php-jsonfast
+
+override_dh_auto_build:
+	cargo build --release
+
+override_dh_auto_test:
+	true
+
+override_dh_auto_install:
+	install -d debian/php-jsonfast/usr/lib/php/$(PHP_API_DIR)
+	install -m 0644 target/release/libphp_jsonfast.so debian/php-jsonfast/usr/lib/php/$(PHP_API_DIR)/php_jsonfast.so
+
+	install -d debian/php-jsonfast/etc/php/$(PHP_VERSION)/mods-available
+	install -m 0644 debian/php_jsonfast.ini debian/php-jsonfast/etc/php/$(PHP_VERSION)/mods-available/jsonfast.ini
