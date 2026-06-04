@@ -16,6 +16,6 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/lib"
 ENV RUSTFLAGS="-L /usr/lib -lphp"
 
-RUN cargo install cargo-php --locked --version 0.1.10
+RUN cargo install cargo-php --locked --version 0.1.18
 
 WORKDIR /app

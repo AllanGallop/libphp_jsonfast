@@ -630,7 +630,7 @@ Benchmark dependencies (installed via Composer):
 - Path wildcards are supported in `search()` (`users[*].email`), not in `get()`.
 - `OUTPUT_STRING` on `beautify()` preserves the requested indent; other methods return compact JSON strings.
 - `OUTPUT_OBJECT` maps JSON objects to `stdClass`; JSON arrays remain PHP arrays.
-- Current development targets PHP 8.x via `ext-php-rs` 0.13.
+- Current development targets PHP 8.x via `ext-php-rs` 0.15.
 
 ## Repository structure
 

@@ -120,5 +120,5 @@ impl JsonFast {
 
 #[php_module]
 pub fn module(module: ModuleBuilder) -> ModuleBuilder {
-    module
+    module.class::<JsonFast>()
 }

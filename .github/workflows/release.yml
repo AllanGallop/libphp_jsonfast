@@ -41,7 +41,7 @@ jobs:
           RUSTFLAGS: -L /usr/lib -lphp
         run: |
           . "$HOME/.cargo/env"
-          cargo install cargo-php --locked --version 0.1.10
+          cargo install cargo-php --locked --version 0.1.18
 
       - name: Build and test
         env:
@@ -80,6 +80,15 @@ jobs:
 
       - name: Install Rust (nightly)
         uses: dtolnay/rust-toolchain@nightly
+
+      - name: Configure libclang
+        shell: pwsh
+        run: |
+          if (Test-Path "C:\Program Files\LLVM\bin\libclang.dll") {
+            echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $env:GITHUB_ENV
+          } elseif (Test-Path "C:\Program Files (x86)\LLVM\bin\libclang.dll") {
+            echo "LIBCLANG_PATH=C:\Program Files (x86)\LLVM\bin" >> $env:GITHUB_ENV
+          }
 
       - name: Build
         run: cargo build --release
