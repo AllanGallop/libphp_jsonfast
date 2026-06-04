@@ -1,11 +1,14 @@
 ifeq ($(OS),Windows_NT)
 	EXT := target/release/php_jsonfast.dll
+	EXT_DEBUG := target/debug/php_jsonfast.dll
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		EXT := target/release/libphp_jsonfast.dylib
+		EXT_DEBUG := target/debug/libphp_jsonfast.dylib
 	else
 		EXT := target/release/libphp_jsonfast.so
+		EXT_DEBUG := target/debug/libphp_jsonfast.so
 	endif
 endif
 
@@ -24,10 +27,12 @@ release: build stubs test-all
 
 LIBPHP_SO ?= $(LIBPHP_DIR)/libphp.so
 
-stubs: build
+# ext_php_rs_describe_module is only exported in debug builds (cfg(debug_assertions))
+stubs:
+	cargo build
 	LD_LIBRARY_PATH=$(LIBPHP_DIR):$$LD_LIBRARY_PATH \
 	LD_PRELOAD=$(LIBPHP_SO) \
-	cargo php stubs $(EXT) --stdout > php_jsonfast.stub.php
+	cargo php stubs $(EXT_DEBUG) --stdout > php_jsonfast.stub.php
 
 test: test-all
 
