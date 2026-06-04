@@ -48,7 +48,7 @@ jobs:
       - name: Generate stubs
         run: |
           . "$HOME/.cargo/env"
-          make stubs LIBPHP_DIR="${LIBPHP_DIR}"
+          make stubs LIBPHP_DIR="${LIBPHP_DIR}" LIBPHP_SO="${LIBPHP_SO}"
 
       - name: Run tests
         run: |

@@ -46,7 +46,7 @@ jobs:
       - name: Build and test
         run: |
           . "$HOME/.cargo/env"
-          make release LIBPHP_DIR="${LIBPHP_DIR}"
+          make release LIBPHP_DIR="${LIBPHP_DIR}" LIBPHP_SO="${LIBPHP_SO}"
 
       - name: Package release
         run: |

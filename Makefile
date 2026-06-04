@@ -22,9 +22,11 @@ LIBPHP_DIR ?= /usr/lib
 
 release: build stubs test-all
 
+LIBPHP_SO ?= $(LIBPHP_DIR)/libphp.so
+
 stubs: build
 	LD_LIBRARY_PATH=$(LIBPHP_DIR):$$LD_LIBRARY_PATH \
-	LD_PRELOAD=$(LIBPHP_DIR)/libphp.so \
+	LD_PRELOAD=$(LIBPHP_SO) \
 	cargo php stubs $(EXT) --stdout > php_jsonfast.stub.php
 
 test: test-all
