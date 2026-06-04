@@ -4,6 +4,7 @@
 ![Latest Release](https://img.shields.io/github/v/release/AllanGallop/libphp_jsonfast)
 
 # php_jsonfast
+> [https://skullfire.co.uk/libphp-jsonfast](https://skullfire.co.uk/libphp-jsonfast/)
 
 [Features](#features) | [Why JsonFast](#why-jsonfast) | [Performance](#performance)
 | [API](#api) | [Quick Start](#quick-start) | [Install via Package](#install-via-package)
@@ -129,6 +130,8 @@ Reported metrics:
 ---
 
 # API
+
+> View the full docs [here](https://skullfire.co.uk/libphp-jsonfast/)
 
 ## Class: `JsonFast`
 
@@ -425,11 +428,11 @@ php -d extension=.\php_jsonfast-windows-x86_64-php83.dll -r "var_dump(JsonFast::
 
 ### Debian / Ubuntu
 
-Install from the `.deb` attached to the latest GitHub release:
+Install from the `.deb` attached to the latest GitHub release (replace `1.X.X-1` with latest version):
 
 ```bash
-curl -LO https://github.com/AllanGallop/libphp_jsonfast/releases/latest/download/php-jsonfast-amd64.deb
-sudo apt install ./php-jsonfast-amd64.deb
+curl -LO https://github.com/AllanGallop/libphp_jsonfast/releases/latest/download/php-jsonfast_1.X.X-1_amd64.deb
+sudo apt install ./php-jsonfast_1.X.X-1_amd64.deb
 ```
 
 Verify:
