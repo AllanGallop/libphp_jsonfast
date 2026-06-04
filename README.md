@@ -326,7 +326,7 @@ Diffs two JSON Schema documents.
 
 ## Quick start
 
-[Download](https://github.com/AllanGallop/libphp_jsonfast/releases/latest) the latest Linux build and load it in PHP without compiling from source.
+[Download](https://github.com/AllanGallop/libphp_jsonfast/releases/latest) the latest Linux or Windows build and load it in PHP without compiling from source.
 
 1. Download and extract the release archive:
 
@@ -371,7 +371,55 @@ Load directly for a one-off command:
 php -d extension=./php_jsonfast-linux-x86_64-php83.so -r "var_dump(JsonFast::validate('{\"ok\":true}'));"
 ```
 
-Current release artifacts target **Linux x86_64** and **PHP 8.3**. Windows DLL and macOS builds may be added later.
+Current release artifacts target **Linux and Windows x86_64** with **PHP 8.3** (non-thread-safe). macOS builds may be added later.
+
+### Windows
+
+1. Download and extract the release archive:
+
+```powershell
+Invoke-WebRequest -Uri "https://github.com/AllanGallop/libphp_jsonfast/releases/latest/download/php_jsonfast-windows-x86_64-php83.zip" -OutFile php_jsonfast.zip
+Expand-Archive php_jsonfast.zip -DestinationPath .
+```
+
+This produces `php_jsonfast-windows-x86_64-php83.dll` along with stubs and documentation.
+
+2. Copy the DLL into your PHP extensions directory. Find it with:
+
+```powershell
+php -i | findstr extension_dir
+```
+
+Typical path for PHP 8.3 NTS x64:
+
+```
+C:\php\ext
+```
+
+```powershell
+Copy-Item php_jsonfast-windows-x86_64-php83.dll C:\php\ext\php_jsonfast.dll
+```
+
+3. Enable the extension in `php.ini`:
+
+```ini
+extension=php_jsonfast.dll
+```
+
+4. Verify:
+
+```powershell
+php -m | findstr jsonfast
+php -r "var_dump(class_exists('JsonFast'));"
+```
+
+Load directly for a one-off command:
+
+```powershell
+php -d extension=.\php_jsonfast-windows-x86_64-php83.dll -r "var_dump(JsonFast::validate('{\"ok\":true}'));"
+```
+
+> Windows builds require the same PHP variant as the release: **PHP 8.3 x64 NTS** from [windows.php.net](https://windows.php.net/download/). Thread-safe (TS) PHP needs a matching TS build (not yet published).
 
 ## Install via Package
 
@@ -397,12 +445,20 @@ The package installs the shared library and drop-in configuration under `/etc/ph
 
 Requirements:
 
-- Rust stable toolchain
+- Rust **stable** on Linux/macOS; Rust **nightly** on Windows (for `abi_vectorcall`)
 - PHP 8.x development headers (provided by `ext-php-rs` build)
 - `libclang` (for bindgen on Linux/macOS/Windows)
+- On Windows: PHP from [windows.php.net](https://windows.php.net/download/) and Visual Studio Build Tools (`cl.exe`)
 
 ```bash
 cargo build --release
+```
+
+On Windows:
+
+```powershell
+rustup toolchain install nightly
+cargo +nightly build --release
 ```
 
 Load the built extension:

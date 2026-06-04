@@ -57,12 +57,70 @@ jobs:
           cp php_jsonfast.stub.php dist/
           cp README.md dist/ 2>/dev/null || cp ReadMe.md dist/ 2>/dev/null || true
           cd dist
-          zip php_jsonfast-linux-x86_64-php83.zip *
+          zip ../php_jsonfast-linux-x86_64-php83.zip *
+
+      - name: Upload Linux release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: php_jsonfast-linux-x86_64-php83.zip
+
+  release-windows-php83:
+    name: Release Windows PHP 8.3
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: none
+
+      - name: Install Rust (nightly)
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $ext = Join-Path $env:GITHUB_WORKSPACE "target\release\php_jsonfast.dll"
+          php -d "extension=$ext" tests/run_all.php
+
+      - name: Package release
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp target/release/php_jsonfast.dll dist/php_jsonfast-windows-x86_64-php83.dll
+          cp php_jsonfast.stub.php dist/ 2>/dev/null || true
+          cp README.md dist/
+          cd dist
+          7z a ../php_jsonfast-windows-x86_64-php83.zip *
+
+      - name: Upload Windows release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: php_jsonfast-windows-x86_64-php83.zip
+
+  github-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: [release-linux-php83, release-windows-php83]
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/php_jsonfast-linux-x86_64-php83.zip
+          files: dist/*.zip
           generate_release_notes: true
 
   build-deb:

@@ -64,3 +64,34 @@ jobs:
           path: |
             target/release/libphp_jsonfast.so
             php_jsonfast.stub.php
+
+  windows-php83:
+    name: Windows / PHP 8.3
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: none
+
+      - name: Install Rust (nightly)
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          $ext = Join-Path $env:GITHUB_WORKSPACE "target\release\php_jsonfast.dll"
+          php -d "extension=$ext" tests/run_all.php
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-jsonfast-windows-php83
+          path: target/release/php_jsonfast.dll
