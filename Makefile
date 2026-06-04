@@ -18,10 +18,14 @@ PHP_RUN = $(PHP) $(PHP_FLAGS)
 build:
 	cargo build --release
 
+LIBPHP_DIR ?= /usr/lib
+
 release: build stubs test-all
 
-stubs:
-	cargo php stubs --stdout > php_jsonfast.stub.php
+stubs: build
+	LD_LIBRARY_PATH=$(LIBPHP_DIR):$$LD_LIBRARY_PATH \
+	LD_PRELOAD=$(LIBPHP_DIR)/libphp.so \
+	cargo php stubs $(EXT) --stdout > php_jsonfast.stub.php
 
 test: test-all
 

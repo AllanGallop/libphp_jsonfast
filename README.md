@@ -481,8 +481,9 @@ Generate PHP stubs:
 
 ```bash
 make stubs
-# or
-cargo php stubs --stdout > php_jsonfast.stub.php
+# or (Linux/macOS: requires libphp embed and LD_PRELOAD)
+LD_LIBRARY_PATH=/usr/lib LD_PRELOAD=/usr/lib/libphp.so \
+  cargo php stubs target/release/libphp_jsonfast.so --stdout > php_jsonfast.stub.php
 ```
 
 Install PHP benchmark dependencies:

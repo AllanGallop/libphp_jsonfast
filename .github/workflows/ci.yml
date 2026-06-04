@@ -23,8 +23,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential clang libclang-dev pkg-config make \
-            libphp8.3-embed
+            build-essential clang libclang-dev pkg-config make
+
+      - name: Configure libphp embed
+        run: bash .github/scripts/configure-libphp-embed.sh
 
       - name: Install Rust
         run: |
@@ -33,9 +35,7 @@ jobs:
 
       - name: Install cargo-php
         env:
-          LIBRARY_PATH: /usr/lib
-          LD_LIBRARY_PATH: /usr/lib
-          RUSTFLAGS: -L /usr/lib -lphp
+          RUSTFLAGS: -L ${{ env.LIBPHP_DIR }} -lphp
         run: |
           . "$HOME/.cargo/env"
           cargo install cargo-php --locked --version 0.1.18
@@ -46,11 +46,9 @@ jobs:
           make build
 
       - name: Generate stubs
-        env:
-          LD_LIBRARY_PATH: /usr/lib
         run: |
           . "$HOME/.cargo/env"
-          make stubs
+          make stubs LIBPHP_DIR="${LIBPHP_DIR}"
 
       - name: Run tests
         run: |

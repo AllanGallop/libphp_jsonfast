@@ -1,5 +1,4 @@
 use serde_json::Value;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 enum Segment {
@@ -28,20 +27,6 @@ pub fn has(json: &str, path: &str) -> bool {
     get(json, path).is_some()
 }
 
-pub fn search(json: &str, path: &str) -> Vec<String> {
-    let value: Value = match serde_json::from_str(json) {
-        Ok(v) => v,
-        Err(_) => return vec![],
-    };
-
-    let segments = parse_path(path);
-    let mut results = Vec::new();
-
-    collect_search_values(&value, &segments, &mut results);
-
-    results.into_iter().map(value_to_string).collect()
-}
-
 pub fn search_values(json: &str, path: &str) -> Vec<Value> {
     let value: Value = match serde_json::from_str(json) {
         Ok(v) => v,
@@ -54,19 +39,6 @@ pub fn search_values(json: &str, path: &str) -> Vec<Value> {
     collect_search_values(&value, &segments, &mut results);
 
     results.into_iter().cloned().collect()
-}
-
-pub fn extract(json: &str, paths: Vec<String>) -> HashMap<String, Option<String>> {
-    let mut result = HashMap::new();
-
-    for path in paths {
-        result.insert(
-            path.clone(),
-            get(json, &path),
-        );
-    }
-
-    result
 }
 
 pub fn extract_values(json: &str, paths: Vec<String>) -> Value {

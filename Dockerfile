@@ -5,8 +5,8 @@ RUN apt-get update && apt-get install -y \
     ca-certificates gnupg lsb-release software-properties-common \
     && add-apt-repository ppa:ondrej/php -y \
     && apt-get update \
-    && apt-get install -y \
-    php8.3-cli php8.3-dev libphp8.3-embed \
+    && (apt-get install -y php8.3-cli php8.3-dev libphp8.3-embed-dbgsym \
+        || apt-get install -y php8.3-cli php8.3-dev libphp8.3-embed) \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
