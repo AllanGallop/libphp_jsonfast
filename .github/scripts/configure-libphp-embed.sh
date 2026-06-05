@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  libphp8.3-embed libphp8.3-embed-dbgsym
+if [ -z "${SKIP_EMBED_APT_INSTALL:-}" ]; then
+  sudo apt-get update
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    libphp8.3-embed libphp8.3-embed-dbgsym
+fi
 
 find_libphp_so() {
   local path=""
@@ -66,3 +68,10 @@ export LIBPHP_SO
 export LIBPHP_DIR
 export LD_LIBRARY_PATH="${LIBPHP_DIR}:${LD_LIBRARY_PATH:-}"
 export LIBRARY_PATH="${LIBPHP_DIR}:${LIBRARY_PATH:-}"
+
+if [ -n "${WRITE_EMBED_ENV:-}" ]; then
+  cat >"${WRITE_EMBED_ENV}" <<EOF
+LIBPHP_DIR=${LIBPHP_DIR}
+LIBPHP_SO=${LIBPHP_SO}
+EOF
+fi

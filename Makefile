@@ -16,7 +16,7 @@ PHP ?= php
 PHP_FLAGS = -d zend.assertions=1 -d assert.exception=1 -d extension=$(EXT)
 PHP_RUN = $(PHP) $(PHP_FLAGS)
 
-.PHONY: build release stubs test test-all test-basic test-output test-path test-analyse-repair test-schema test-diff coverage clean-coverage benchmark
+.PHONY: build release stubs test test-all test-basic test-output test-path test-analyse-repair test-schema test-diff coverage clean-coverage benchmark examples
 
 build:
 	cargo build --release
@@ -70,3 +70,6 @@ BENCH_CAPACITY ?= 200000
 
 benchmark: build
 	$(PHP_RUN) benchmarks/benchmark.php $(BENCH_ITERATIONS) $(BENCH_ITEMS) $(BENCH_CAPACITY)
+
+examples: build
+	$(PHP_RUN) examples/run_all.php

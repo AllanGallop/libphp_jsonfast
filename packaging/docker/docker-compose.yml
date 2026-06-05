@@ -1,3 +1,13 @@
+# Debian Bookworm: build .deb packages (PHP from distro packages).
+# Ubuntu dev image (repo Dockerfile): build extension + run tests/examples.
+
+x-dev-volumes: &dev-volumes
+  - type: bind
+    source: ../..
+    target: /app
+  - cargo-cache:/root/.cargo
+  - target-cache:/app/target
+
 services:
   debian-bookworm:
     image: debian:bookworm
@@ -9,6 +19,24 @@ services:
       - cargo-cache:/root/.cargo
       - target-cache:/app/target
     command: bash packaging/docker/build-deb.sh
+
+  dev-php83:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes: *dev-volumes
+    command: bash packaging/docker/run-dev-checks.sh
+
+  dev-shell:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes: *dev-volumes
+    stdin_open: true
+    tty: true
+    command: bash
 
   test-install:
     image: debian:bookworm

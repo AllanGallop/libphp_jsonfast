@@ -508,11 +508,49 @@ Open a shell:
 docker compose run --rm php-rust bash
 ```
 
-Build, test, and benchmark inside the container:
+Build, test, examples, and benchmark inside the container:
 
 ```bash
 make test
+make examples
 make benchmark
+```
+
+One-shot from the host (builds the image, runs tests + examples):
+
+```bash
+docker compose run --rm run-checks
+docker compose run --rm run-examples
+docker compose run --rm run-tests
+```
+
+From `packaging/docker` (same Ubuntu PHP 8.3 dev image, cached cargo/target volumes):
+
+```bash
+cd packaging/docker
+docker compose run --rm dev-php83
+docker compose run --rm dev-shell
+```
+
+## Examples
+
+Runnable scripts live under `examples/`. Each file focuses on one area of the API.
+
+| Script | Topics |
+|--------|--------|
+| `01_format_and_validate.php` | validate, beautify, minify, output modes |
+| `02_repair_and_unwrap.php` | analyse, repair, inspect, unwrap |
+| `03_path_access.php` | get, has, search, extract |
+| `04_merge_and_diff.php` | merge, diff |
+| `05_schema.php` | getSchema, validateSchema, applySchema, schemaDiff |
+
+Run everything (extension must be built first):
+
+```bash
+make examples
+# or
+php -d extension=target/release/libphp_jsonfast.so examples/run_all.php
+php -d extension=target/release/libphp_jsonfast.so examples/03_path_access.php
 ```
 
 ## Example usage
