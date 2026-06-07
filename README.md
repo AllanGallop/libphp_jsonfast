@@ -56,8 +56,6 @@ make benchmark BENCH_ITERATIONS=1000 BENCH_ITEMS=500 BENCH_CAPACITY=200000
 
 ### Core operation comparisons
 
-[<img src=".github/images/jsonfast_core_benchmarks.png" width="720" alt="Key JsonFast benchmark comparisons">](.github/images/jsonfast_core_benchmarks.png)
-
 | Operation | Implementation | Ops/sec |
 | --- | --- | ---: |
 | Diff | Native PHP | ~170 |
@@ -72,8 +70,6 @@ JsonFast diff is roughly **3.3× faster** than the native PHP helper in this ben
 
 ### Merge / diff throughput
 
-[<img src=".github/images/jsonfast_throughput.png" width="720" alt="JsonFast throughput at 32MB JSON dataset">](.github/images/jsonfast_throughput.png)
-
 Measured on a ~32 MB JSON payload (200k items):
 
 | Operation | Throughput |
@@ -84,9 +80,6 @@ Measured on a ~32 MB JSON payload (200k items):
 ---
 
 ### Large JSON scaling
-
-[<img src=".github/images/jsonfast_scaling.png" width="720" alt="Large JSON scaling benchmark">](.github/images/jsonfast_scaling.png)
-
 
 Capacity benchmark from 1k → 200k items (mean time, ms):
 
@@ -605,30 +598,3 @@ Custom parameters:
 php -d extension=target/release/libphp_jsonfast.so \
     benchmarks/benchmark.php [iterations] [medium_items] [max_capacity_items]
 ```
-
-Benchmark dependencies (installed via Composer):
-
-- `opis/json-schema`
-- `justinrainbow/json-schema`
-
-## Notes
-
-- JsonFast uses strict RFC 8259 parsing via `serde_json`. It does not repair or coerce non-standard input. Invalid tokens such as `False`, `True`, unquoted keys, single-quoted strings, or trailing commas are rejected — they are never silently rewritten (for example, `{"is_admin":False}` would not become `{"is_admin":"False"}`, which would be truthy in PHP).
-- Schema validation implements a focused subset of JSON Schema (types, `required`, `properties`, `items`, `default`) — not the full draft spec.
-- Path wildcards are supported in `search()` (`users[*].email`), not in `get()`.
-- `OUTPUT_STRING` on `beautify()` preserves the requested indent; other methods return compact JSON strings.
-- `OUTPUT_OBJECT` maps JSON objects to `stdClass`; JSON arrays remain PHP arrays.
-- Current development targets PHP 8.x via `ext-php-rs` 0.15.
-
-## Repository structure
-
-- `src/` — Rust source for the PHP extension
-- `src/lib.rs` — `JsonFast` class and module entry
-- `tests/` — PHP integration tests
-- `benchmarks/` — comparison benchmarks against native PHP and schema libraries
-- `.github/images/` — README benchmark charts
-- `Cargo.toml` — Rust crate metadata and dependencies
-- `composer.json` — PHP benchmark/test dependencies
-- `Dockerfile` — container environment for building and testing
-- `docker-compose.yaml` — local Docker workflow
-- `Makefile` — build, test, stub, coverage, and benchmark commands
