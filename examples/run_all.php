@@ -7,7 +7,7 @@ require_jsonfast();
 
 $examples = [
     '01_format_and_validate.php',
-    '02_repair_and_unwrap.php',
+    '02_inspect_and_unwrap.php',
     '03_path_access.php',
     '04_merge_and_diff.php',
     '05_schema.php',

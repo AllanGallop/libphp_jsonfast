@@ -5,7 +5,6 @@ use ext_php_rs::types::Zval;
 
 mod utils;
 mod analyse;
-mod repair;
 mod format;
 mod inspector;
 mod unwrapping;
@@ -23,15 +22,6 @@ impl JsonFast {
     pub const OUTPUT_ARRAY: u32 = utils::OUTPUT_ARRAY;
     pub const OUTPUT_STRING: u32 = utils::OUTPUT_STRING;
     pub const OUTPUT_OBJECT: u32 = utils::OUTPUT_OBJECT;
-    pub const REPAIR_BOM: u32 = 1 << 0;
-    pub const REPAIR_JSONP: u32 = 1 << 1;
-    pub const REPAIR_COMMENTS: u32 = 1 << 2;
-    pub const REPAIR_TRAILING_COMMAS: u32 = 1 << 3;
-    pub const REPAIR_DOUBLE_ENCODED: u32 = 1 << 4;
-    pub const REPAIR_UNQUOTED_STRINGS: u32 = 1 << 5;
-    pub const REPAIR_SINGLE_QUOTES: u32 = 1 << 6;
-    pub const REPAIR_UNQUOTED_KEYS: u32 = 1 << 7;
-    pub const REPAIR_ALL: u32 = 0xFF;
 
     pub fn test_json_value(output: Option<u32>) -> PhpResult<Zval> {
         let value: serde_json::Value = serde_json::json!({
@@ -41,10 +31,6 @@ impl JsonFast {
         });
 
         utils::encode_output(&value, output.unwrap_or(Self::OUTPUT_ARRAY))
-    }
-
-    pub fn repair(json: String, flags: Option<u32>, output: Option<u32>) -> PhpResult<Zval> {
-        repair::repair(&json, flags.unwrap_or(Self::REPAIR_ALL), output.unwrap_or(Self::OUTPUT_ARRAY))
     }
 
     pub fn analyse(json: String, output: Option<u32>) -> PhpResult<Zval> {

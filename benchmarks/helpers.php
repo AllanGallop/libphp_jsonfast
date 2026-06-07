@@ -163,45 +163,6 @@ final class JsonFixtures
         return json_encode($data, JSON_THROW_ON_ERROR);
     }
 
-    public static function brokenSmallJson(): string
-    {
-        return <<<'JSON'
-        {
-            // user profile
-            "name": "Allan",
-            "active": true,
-        }
-        JSON;
-    }
-
-    public static function brokenMediumJson(int $items = 500): string
-    {
-        $lines = [
-            '{',
-            '  // generated payload',
-            '  "generated_at": "2026-06-03T12:00:00Z",',
-            '  "count": ' . $items . ',',
-            '  "users": [',
-        ];
-
-        for ($i = 0; $i < $items; ++$i) {
-            $active = $i % 2 === 0 ? 'true' : 'false';
-            $lines[] = sprintf(
-                '    {"id": %d, "name": "User %d", "email": "user%d@example.com", "active": %s, "tags": ["php", "rust"], "meta": {"created": "2026-01-01T00:00:00Z", "score": %.1f}},',
-                $i,
-                $i,
-                $i,
-                $active,
-                $i * 1.5
-            );
-        }
-
-        $lines[] = '  ],';
-        $lines[] = '}';
-
-        return implode("\n", $lines);
-    }
-
     public static function mediumSchemaJson(): string
     {
         return <<<'JSON'

@@ -17,4 +17,4 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  ${php:Depends}
-Description: PHP extension for parsing, repair, formatting and schema validation JSON.
+Description: PHP extension for parsing, formatting and schema validation JSON.

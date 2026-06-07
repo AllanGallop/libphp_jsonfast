@@ -27,12 +27,8 @@ $smallData = JsonFixtures::smallDocument();
 $mediumJson = JsonFixtures::mediumJson($mediumItems);
 $mediumModifiedJson = JsonFixtures::modifiedMediumJson($mediumJson);
 $overlayJson = JsonFixtures::overlayJson();
-$brokenSmallJson = JsonFixtures::brokenSmallJson();
-$brokenMediumJson = JsonFixtures::brokenMediumJson($mediumItems);
 $schemaJson = JsonFixtures::mediumSchemaJson();
 
-$brokenSmallBytes = strlen($brokenSmallJson);
-$brokenMediumBytes = strlen($brokenMediumJson);
 $schemaPayloadBytes = strlen($mediumJson) + strlen($schemaJson);
 
 $opisValidator = new OpisValidator();
@@ -43,24 +39,6 @@ $justinRainbowSchema = json_decode($schemaJson, false, flags: JSON_THROW_ON_ERRO
 echo "JsonFast benchmark" . PHP_EOL;
 echo "PHP " . PHP_VERSION . ' | iterations=' . $iterations . ' | medium_items=' . $mediumItems . PHP_EOL;
 echo str_repeat('=', 96) . PHP_EOL;
-
-$results[] = $runner->measure(
-    'repair_small',
-    'jsonfast',
-    static function () use ($brokenSmallJson): void {
-        JsonFast::repair($brokenSmallJson, JsonFast::REPAIR_ALL, JsonFast::OUTPUT_STRING);
-    },
-    $brokenSmallBytes,
-);
-
-$results[] = $runner->measure(
-    'repair_medium',
-    'jsonfast',
-    static function () use ($brokenMediumJson): void {
-        JsonFast::repair($brokenMediumJson, JsonFast::REPAIR_ALL, JsonFast::OUTPUT_STRING);
-    },
-    $brokenMediumBytes,
-);
 
 $results[] = $runner->measure('encode_compact', 'native', static function () use ($smallData): void {
     json_encode($smallData, JSON_THROW_ON_ERROR);
@@ -171,16 +149,8 @@ function run_capacity_benchmarks(int $maxItems): array
 
     foreach ($sizes as $items) {
         try {
-            $broken = JsonFixtures::brokenMediumJson($items);
-            $bytes = strlen($broken);
             $json = JsonFixtures::mediumJson($items);
             $modified = JsonFixtures::modifiedMediumJson($json);
-
-            $repair = measure_capacity('repair', $items, $bytes, static function () use ($broken): void {
-                JsonFast::repair($broken, JsonFast::REPAIR_ALL, JsonFast::OUTPUT_STRING);
-            });
-
-            $rows[] = ['operation' => 'jsonfast repair', ...$repair];
 
             $merge = measure_capacity('merge', $items, strlen($json), static function () use ($json, $modified): void {
                 JsonFast::merge($json, $modified, JsonFast::OUTPUT_STRING);

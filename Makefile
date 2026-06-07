@@ -16,7 +16,7 @@ PHP ?= php
 PHP_FLAGS = -d zend.assertions=1 -d assert.exception=1 -d extension=$(EXT)
 PHP_RUN = $(PHP) $(PHP_FLAGS)
 
-.PHONY: build release stubs test test-all test-basic test-output test-path test-analyse-repair test-schema test-diff coverage clean-coverage benchmark examples
+.PHONY: build release stubs test test-all test-basic test-output test-path test-analyse test-strict-json test-schema test-diff coverage clean-coverage benchmark examples
 
 build:
 	cargo build --release
@@ -48,8 +48,11 @@ test-output: build
 test-path: build
 	$(PHP_RUN) tests/path.php
 
-test-analyse-repair: build
-	$(PHP_RUN) tests/analyse_repair.php
+test-analyse: build
+	$(PHP_RUN) tests/analyse.php
+
+test-strict-json: build
+	$(PHP_RUN) tests/strict_json.php
 
 test-schema: build
 	$(PHP_RUN) tests/schema.php

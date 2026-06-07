@@ -10,27 +10,7 @@ namespace {
 
         const OUTPUT_OBJECT = null;
 
-        const REPAIR_BOM = null;
-
-        const REPAIR_JSONP = null;
-
-        const REPAIR_COMMENTS = null;
-
-        const REPAIR_TRAILING_COMMAS = null;
-
-        const REPAIR_DOUBLE_ENCODED = null;
-
-        const REPAIR_UNQUOTED_STRINGS = null;
-
-        const REPAIR_SINGLE_QUOTES = null;
-
-        const REPAIR_UNQUOTED_KEYS = null;
-
-        const REPAIR_ALL = null;
-
         public static function testJsonValue(?int $output): mixed {}
-
-        public static function repair(string $json, ?int $flags, ?int $output): mixed {}
 
         public static function analyse(string $json, ?int $output): mixed {}
 

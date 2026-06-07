@@ -14,27 +14,13 @@ $broken = <<<'JSON'
 }
 JSON;
 
-section('Analyse broken JSON before repair');
+section('Analyse invalid JSON');
 
 $analysis = JsonFast::analyse($broken);
 show([
     'valid' => $analysis['valid'],
-    'repairable' => $analysis['repairable'],
-    'suggested_flags' => array_column($analysis['repairs'], 'flag'),
+    'error' => $analysis['error'],
 ]);
-
-section('Repair with selected flags');
-
-$fixed = JsonFast::repair(
-    $broken,
-    JsonFast::REPAIR_COMMENTS
-        | JsonFast::REPAIR_TRAILING_COMMAS
-        | JsonFast::REPAIR_UNQUOTED_KEYS
-        | JsonFast::REPAIR_UNQUOTED_STRINGS,
-    JsonFast::OUTPUT_STRING
-);
-
-echo $fixed;
 
 section('Inspect a syntax error');
 

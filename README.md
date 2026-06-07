@@ -10,9 +10,7 @@
 | [API](#api) | [Quick Start](#quick-start) | [Install via Package](#install-via-package)
 | [Building](#build-and-install-from-source) | [Docker](#docker-usage) | [Testing](#testing) | [Benchmarks](#benchmarks)
 
-`php_jsonfast` is a PHP extension written in Rust that provides fast JSON parsing, repair, formatting, path access, schema validation, merge/diff, and flexible output modes — returning native PHP arrays, JSON strings, or `stdClass` objects.
-
-✔ Repair malformed JSON (comments, JSONP, trailing commas, and more)
+`php_jsonfast` is a PHP extension written in Rust that provides fast JSON parsing, formatting, path access, schema validation, merge/diff, and flexible output modes — returning native PHP arrays, JSON strings, or `stdClass` objects.
 
 ✔ Dot-path and wildcard path access
 
@@ -26,8 +24,7 @@
 
 ## Features
 
-- **Repair** broken JSON from real-world sources (JavaScript literals, JSONP wrappers, BOM, comments)
-- **Analyse** invalid JSON and get suggested repair flags before fixing
+- **Analyse** invalid JSON and get error location details
 - **Format** JSON with configurable indentation or compact minification
 - **Path access** with dot notation and wildcards (`user.name`, `users[*].email`)
 - **Transform** documents with deep merge and structural diff
@@ -36,10 +33,9 @@
 
 ## Why JsonFast?
 
-Most PHP JSON workflows combine `json_decode()`, manual array walking, and third-party libraries for repair and schema validation. `php_jsonfast` consolidates these into a single Rust-backed extension:
+Most PHP JSON workflows combine `json_decode()`, manual array walking, and third-party libraries for schema validation. `php_jsonfast` consolidates these into a single Rust-backed extension:
 
-- One API for parse, repair, format, path, merge, diff, and schema operations
-- Repair logic for common non-standard JSON (not supported by `json_decode()`)
+- One API for parse, format, path, merge, diff, and schema operations
 - Path queries without decoding the full document into PHP first
 - Schema validation without pulling in a separate Composer dependency
 - Consistent output mode control across all methods
@@ -74,15 +70,14 @@ JsonFast diff is roughly **3.3× faster** than the native PHP helper in this ben
 
 ---
 
-### Repair / merge / diff throughput
+### Merge / diff throughput
 
 [<img src=".github/images/jsonfast_throughput.png" width="720" alt="JsonFast throughput at 32MB JSON dataset">](.github/images/jsonfast_throughput.png)
 
-Measured on a ~32 MB broken/repairable JSON payload (200k items):
+Measured on a ~32 MB JSON payload (200k items):
 
 | Operation | Throughput |
 | --- | ---: |
-| Repair | ~33 MB/sec |
 | Merge | ~46 MB/sec |
 | Diff | ~38 MB/sec |
 
@@ -95,14 +90,14 @@ Measured on a ~32 MB broken/repairable JSON payload (200k items):
 
 Capacity benchmark from 1k → 200k items (mean time, ms):
 
-| Items | Repair | Merge | Diff |
-| ---: | ---: | ---: | ---: |
-| 1,000 | ~5 | ~2 | ~3 |
-| 50,000 | ~250 | ~160 | ~210 |
-| 100,000 | ~590 | ~320 | ~420 |
-| 200,000 | ~1,060 | ~700 | ~850 |
+| Items | Merge | Diff |
+| ---: | ---: | ---: |
+| 1,000 | ~2 | ~3 |
+| 50,000 | ~160 | ~210 |
+| 100,000 | ~320 | ~420 |
+| 200,000 | ~700 | ~850 |
 
-All three operations scale roughly linearly with document size in this test.
+Both operations scale roughly linearly with document size in this test.
 
 ---
 
@@ -110,7 +105,6 @@ The benchmark suite compares `JsonFast` against native PHP and popular libraries
 
 | Category | Compared against |
 | --- | --- |
-| Repair | JsonFast throughput (files/sec, MB/sec) |
 | Encode / beautify / minify | `json_encode()` |
 | Path access | `json_decode()` + manual traversal |
 | Merge / diff | Native PHP helpers |
@@ -122,8 +116,6 @@ Reported metrics:
 | --- | --- |
 | Ops/sec | Operations completed per second |
 | Mean / P95 | Average and 95th percentile latency (ms) |
-| Files/sec | Repair throughput by document count |
-| MB/sec | Repair throughput by input payload size |
 | Peak memory | Peak allocated memory during benchmark |
 | Large JSON capacity | Scaling test from 1k → 200k nested records |
 
@@ -145,20 +137,6 @@ All methods are static. Data-returning methods accept an optional `$output` argu
 | `JsonFast::OUTPUT_STRING` | `1` | Compact or formatted JSON string |
 | `JsonFast::OUTPUT_OBJECT` | `2` | `stdClass` for JSON objects |
 
-### Repair constants
-
-| Constant | Description |
-| --- | --- |
-| `REPAIR_BOM` | Strip UTF-8 byte order mark |
-| `REPAIR_JSONP` | Strip JSONP wrapper (`callback(...)`) |
-| `REPAIR_COMMENTS` | Remove `//` and `/* */` comments |
-| `REPAIR_TRAILING_COMMAS` | Remove trailing commas |
-| `REPAIR_DOUBLE_ENCODED` | Unwrap double-encoded JSON strings |
-| `REPAIR_UNQUOTED_STRINGS` | Quote unquoted string values |
-| `REPAIR_SINGLE_QUOTES` | Convert single quotes to double quotes |
-| `REPAIR_UNQUOTED_KEYS` | Quote unquoted object keys |
-| `REPAIR_ALL` | All repair flags combined |
-
 ---
 
 ### `validate(string $json): bool`
@@ -167,37 +145,19 @@ Returns `true` if the input is valid JSON.
 
 ---
 
-### `repair(string $json, ?int $flags = REPAIR_ALL, ?int $output = OUTPUT_ARRAY): mixed`
-
-Repairs malformed JSON using the specified flag bitmask.
-
-```php
-$fixed = JsonFast::repair($broken, JsonFast::REPAIR_ALL, JsonFast::OUTPUT_STRING);
-```
-
----
-
 ### `analyse(string $json, ?int $output = OUTPUT_ARRAY): mixed`
 
-Analyses JSON and returns validity, error location, and suggested repair flags.
+Analyses JSON and returns validity with error location for invalid input. Invalid documents are reported as-is; JsonFast does not attempt to fix or rewrite them.
 
 Example return value (array output):
 
 ```php
 [
     'valid' => false,
-    'repairable' => true,
     'error' => [
         'message' => '...',
         'line' => 3,
         'column' => 18,
-    ],
-    'repairs' => [
-        [
-            'flag' => 'REPAIR_COMMENTS',
-            'bit' => 4,
-            'description' => 'Removes // and /* */ comments',
-        ],
     ],
 ]
 ```
@@ -539,7 +499,7 @@ Runnable scripts live under `examples/`. Each file focuses on one area of the AP
 | Script | Topics |
 |--------|--------|
 | `01_format_and_validate.php` | validate, beautify, minify, output modes |
-| `02_repair_and_unwrap.php` | analyse, repair, inspect, unwrap |
+| `02_inspect_and_unwrap.php` | analyse, inspect, unwrap |
 | `03_path_access.php` | get, has, search, extract |
 | `04_merge_and_diff.php` | merge, diff |
 | `05_schema.php` | getSchema, validateSchema, applySchema, schemaDiff |
@@ -576,19 +536,6 @@ $compact = JsonFast::minify($json, JsonFast::OUTPUT_STRING);
 // Object output (stdClass)
 $object = JsonFast::minify($json, JsonFast::OUTPUT_OBJECT);
 echo $object->name;
-
-//--------------------------------------------------------------------//
-
-// Repair broken JSON
-$broken = <<<'JSON'
-{
-    // user profile
-    "name": Allan,
-    "active": true,
-}
-JSON;
-
-$fixed = JsonFast::repair($broken, JsonFast::REPAIR_ALL, JsonFast::OUTPUT_STRING);
 
 //--------------------------------------------------------------------//
 
@@ -632,7 +579,8 @@ Individual test targets:
 make test-basic
 make test-output
 make test-path
-make test-analyse-repair
+make test-analyse
+make test-strict-json
 make test-schema
 make test-diff
 ```
@@ -665,6 +613,7 @@ Benchmark dependencies (installed via Composer):
 
 ## Notes
 
+- JsonFast uses strict RFC 8259 parsing via `serde_json`. It does not repair or coerce non-standard input. Invalid tokens such as `False`, `True`, unquoted keys, single-quoted strings, or trailing commas are rejected — they are never silently rewritten (for example, `{"is_admin":False}` would not become `{"is_admin":"False"}`, which would be truthy in PHP).
 - Schema validation implements a focused subset of JSON Schema (types, `required`, `properties`, `items`, `default`) — not the full draft spec.
 - Path wildcards are supported in `search()` (`users[*].email`), not in `get()`.
 - `OUTPUT_STRING` on `beautify()` preserves the requested indent; other methods return compact JSON strings.
