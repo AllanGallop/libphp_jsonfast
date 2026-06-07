@@ -58,7 +58,9 @@ function assert_rejected(string $json): void
     assert_throws(static fn (): mixed => JsonFast::beautify($json));
     assert_throws(static fn (): mixed => JsonFast::minify($json));
     assert_throws(static fn (): mixed => JsonFast::unwrap($json));
-    assert_throws(static fn (): mixed => JsonFast::get($json, 'is_admin'));
+
+    assert(JsonFast::get($json, 'is_admin') === null);
+    assert(JsonFast::has($json, 'is_admin') === false);
 }
 
 function assert_throws(callable $callback): void
