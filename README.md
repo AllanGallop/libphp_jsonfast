@@ -61,10 +61,10 @@ make benchmark BENCH_ITERATIONS=1000 BENCH_ITEMS=500 BENCH_CAPACITY=200000
 | Operation | Implementation | Ops/sec |
 | --- | --- | ---: |
 | Diff | Native PHP | ~170 |
-| Diff | JsonFast | ~570 |
+| **Diff** | **JsonFast** | **~570** |
 | Schema validation | opis/json-schema | ~100 |
 | Schema validation | justinrainbow/json-schema | ~50 |
-| Schema validation | JsonFast | ~920 |
+| **Schema validation** | **JsonFast** | **~920** |
 
 JsonFast diff is roughly **3.3× faster** than the native PHP helper in this benchmark. Schema validation is roughly **9× faster** than Opis and **18× faster** than JustinRainbow on the medium test document.
 
